@@ -35,6 +35,7 @@
         <dependency>
             <groupId>mysql</groupId>
             <artifactId>mysql-connector-java</artifactId>
+            <version>8.0.33</version>
             <scope>runtime</scope>
         </dependency>
         <dependency>
@@ -53,9 +54,9 @@
             <scope>test</scope>
         </dependency>
         <dependency>
-            <groupId>commons-csv</groupId>
+            <groupId>org.apache.commons</groupId>
             <artifactId>commons-csv</artifactId>
-            <version>1.10.0</version>
+            <version>1.9.0</version>
         </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
