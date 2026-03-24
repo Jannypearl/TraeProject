@@ -27,6 +27,17 @@ public class MigrationService {
         logger.info("Executing migration task: {}", taskId);
         MigrationTask task = migrationTaskRepository.findById(taskId)
                 .orElseThrow(() -> new RuntimeException("Migration task not found with id: " + taskId));
+        
+        // 检查任务状态，已经成功的任务不能再次执行
+        if ("SUCCESS".equals(task.getStatus())) {
+            throw new IllegalStateException("Migration task has already been executed successfully and cannot be executed again");
+        }
+        
+        // 检查任务是否正在执行中
+        if ("RUNNING".equals(task.getStatus())) {
+            throw new IllegalStateException("Migration task is currently running, please wait for it to complete");
+        }
+        
         task.setStatus("RUNNING");
         task.setUpdatedAt(new Date());
         migrationTaskRepository.save(task);
