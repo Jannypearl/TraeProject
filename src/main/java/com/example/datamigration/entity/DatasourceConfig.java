@@ -14,7 +14,7 @@ public class DatasourceConfig {
     private String name;
 
     @Column(name = "type", nullable = false)
-    private String type; // ORACLE, TDSQL_MYSQL, TDSQL_PG
+    private String type; // ORACLE, MYSQL, POSTGRESQL, TDSQL_MYSQL, TDSQL_PG
 
     @Column(name = "url", nullable = false)
     private String url;

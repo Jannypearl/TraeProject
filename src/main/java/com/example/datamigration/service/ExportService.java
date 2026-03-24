@@ -37,7 +37,19 @@ public class ExportService {
         logger.info("Exporting data from datasource {} table {}", datasourceId, tableName);
         DatasourceConfig config = datasourceConfigRepository.findById(datasourceId)
                 .orElseThrow(() -> new RuntimeException("Datasource config not found with id: " + datasourceId));
-        config.setDriverClass("oracle.jdbc.OracleDriver");
+        
+        // 根据数据库类型设置驱动类
+        String driverClass;
+        if (config.getType().equals("ORACLE")) {
+            driverClass = "oracle.jdbc.OracleDriver";
+        } else if (config.getType().equals("MYSQL") || config.getType().equals("TDSQL_MYSQL")) {
+            driverClass = "com.mysql.cj.jdbc.Driver";
+        } else if (config.getType().equals("POSTGRESQL") || config.getType().equals("TDSQL_PG")) {
+            driverClass = "org.postgresql.Driver";
+        } else {
+            throw new IllegalArgumentException("Unsupported datasource type: " + config.getType());
+        }
+        config.setDriverClass(driverClass);
         
         try (Connection connection = datasourceService.getConnection(config);
              Statement statement = connection.createStatement();
@@ -60,7 +72,7 @@ public class ExportService {
                 for (int i = 1; i <= columnCount; i++) {
                     headers[i - 1] = metaData.getColumnName(i);
                 }
-                csvPrinter.printRecord(headers);
+                csvPrinter.printRecord((Object[]) headers);
 
                 // 写入数据
                 int rowCount = 0;
