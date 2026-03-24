@@ -1,5 +1,6 @@
 package com.example.datamigration.controller;
 
+import com.example.datamigration.dto.MigrationTaskResponse;
 import com.example.datamigration.entity.MigrationTask;
 import com.example.datamigration.repository.MigrationTaskRepository;
 import com.example.datamigration.service.MigrationService;
@@ -8,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/migration")
@@ -47,8 +50,35 @@ public class MigrationTaskController {
     }
 
     @PostMapping("/{id}/execute")
-    public ResponseEntity<Void> executeTask(@PathVariable Long id) throws Exception {
-        migrationService.executeMigration(id);
-        return ResponseEntity.ok().build();
+    public ResponseEntity<?> executeTask(@PathVariable Long id) {
+        try {
+            migrationService.executeMigration(id);
+            
+            // 获取更新后的任务信息
+            MigrationTask task = migrationTaskRepository.findById(id)
+                    .orElseThrow(() -> new RuntimeException("Migration task not found with id: " + id));
+            
+            // 返回成功响应
+            Map<String, Object> response = new HashMap<>();
+            response.put("success", true);
+            response.put("message", "迁移任务执行成功");
+            response.put("data", Map.of(
+                "taskId", task.getId(),
+                "taskName", task.getTaskName(),
+                "status", task.getStatus(),
+                "tableName", task.getTableName(),
+                "updatedAt", task.getUpdatedAt()
+            ));
+            
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            // 返回错误响应
+            Map<String, Object> errorResponse = new HashMap<>();
+            errorResponse.put("success", false);
+            errorResponse.put("message", "迁移任务执行失败：" + e.getMessage());
+            errorResponse.put("error", e.getClass().getSimpleName());
+            
+            return ResponseEntity.internalServerError().body(errorResponse);
+        }
     }
 }
