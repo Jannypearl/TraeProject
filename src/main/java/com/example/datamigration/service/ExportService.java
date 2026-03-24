@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.sql.Connection;
@@ -63,7 +64,14 @@ public class ExportService {
             String fileName = tempDir + "/" + tableName + "_" + timestamp + ".csv";
             logger.info("Generating CSV file: {}", fileName);
 
-            // 创建CSV文件
+            // 确保临时目录存在
+            File tempDirectory = new File(tempDir);
+            if (!tempDirectory.exists()) {
+                tempDirectory.mkdirs();
+                logger.info("Created temporary directory: {}", tempDir);
+            }
+
+            // 创建 CSV 文件
             try (FileWriter writer = new FileWriter(fileName);
                  CSVPrinter csvPrinter = new CSVPrinter(writer, CSVFormat.DEFAULT)) {
 

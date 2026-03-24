@@ -34,9 +34,9 @@ public class ImportService {
         
         // 根据数据库类型设置驱动类
         String driverClass;
-        if (config.getType().equals("TDSQL_MYSQL")) {
+        if (config.getType().equals("MYSQL") || config.getType().equals("TDSQL_MYSQL")) {
             driverClass = "com.mysql.cj.jdbc.Driver";
-        } else if (config.getType().equals("TDSQL_PG")) {
+        } else if (config.getType().equals("POSTGRESQL") || config.getType().equals("TDSQL_PG")) {
             driverClass = "org.postgresql.Driver";
         } else {
             throw new IllegalArgumentException("Unsupported datasource type: " + config.getType());
